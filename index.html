@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en-nz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ava Roads Routes</title>
+
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 10px 50px;
+    }
+
+    #zones-container {
+      margin-bottom: 20px;
+    }
+
+    #add-zone {
+      margin-bottom: 20px;
+    }
+
+    .zone-row {
+      display: grid;
+      grid-template-columns: 200px 40px;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .zone-row .cell {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .zone-row .cell label {
+      font-size: 0.9em;
+      margin-bottom: 2px;
+    }
+
+    .zone-row .cell input {
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .remove-btn {
+      width: 30px;
+      height: 30px;
+      font-weight: bold;
+      color: white;
+      background: #d9534f;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    #result {
+      width: 100%;
+      margin-top: 10px;
+      box-sizing: border-box;
+    }
+
+    #calculate-button {
+      margin-left: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Yue's Ava Road Route :3</h1>
+
+  <!-- Zones -->
+  <div id="zones-container"></div>
+  <button id="add-zone">+ Add Zone</button>
+
+  <!-- Final zone info -->
+  <div style="margin-top:15px;">
+    <label for="finalzone">Final Zone:</label>
+    <input type="text" id="finalzone" style="width:200px" placeholder="zone name">
+
+    <select id="zonetype">
+      <option value="">--Zone Type--</option>
+      <option>Black Zone</option>
+      <option>Red Zone</option>
+      <option>Yellow Zone</option>
+      <option>Blue Zone</option>
+    </select>
+  </div>
+
+  <div style="margin-top:10px;">
+    <label for="city">City:</label>
+    <select id="city">
+      <option value="">--City--</option>
+      <option value="FS">Fort Sterling</option>
+      <option value="ML">Martlock</option>
+      <option value="BW">Bridgewatch</option>
+      <option value="TH">Thetford</option>
+      <option value="LY">Lymhurst</option>
+    </select>
+
+    <label style="margin-left:20px;">
+      <input type="checkbox" id="isPortal">
+      Portal
+    </label>
+
+    <label for="distance" style="margin-left:20px;"># Zones away:</label>
+    <input type="number" id="distance" min="1" max="5" value="1" style="width:50px;">
+  </div>
+
+  <!-- ONE shared time input -->
+  <div style="margin-top:15px;">
+    <label>Lowest Remaining Time:</label>
+    <input type="number" id="lowHours" min="0" max="23" value="0" style="width:60px;"> h
+    <input type="number" id="lowMins" min="0" max="59" value="0" style="width:60px;"> m
+  </div>
+
+  <!-- Result -->
+  <div style="margin-top:15px;">
+    <input type="text" id="result" placeholder="Click Generate then copy to Discord">
+    <button id="calculate-button">Generate</button>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const maxZones = 10;
+      let zoneCount = 0;
+      const zones = {};
+
+      const zonesContainer = document.getElementById('zones-container');
+      const addZoneBtn = document.getElementById('add-zone');
+
+      function createZoneRow(i) {
+        const row = document.createElement('div');
+        row.className = 'zone-row';
+        row.dataset.index = i;
+
+        row.innerHTML = `
+          <div class="cell">
+            <label for="zone${i}-name">Zone Initials:</label>
+            <input id="zone${i}-name" type="text" placeholder="e.g. SOA">
+          </div>
+          <button class="remove-btn" title="Remove zone">–</button>
+        `;
+
+        zones[i] = { name: '' };
+        zonesContainer.appendChild(row);
+
+        document
+          .getElementById(`zone${i}-name`)
+          .addEventListener('input', () => {
+            zones[i].name =
+              document.getElementById(`zone${i}-name`).value.trim() || '??';
+          });
+
+        row.querySelector('.remove-btn')
+           .addEventListener('click', () => removeZone(i));
+      }
+
+      function removeZone(i) {
+        const row = zonesContainer.querySelector(
+          `.zone-row[data-index='${i}']`
+        );
+        if (!row) return;
+        row.remove();
+        delete zones[i];
+        zoneCount--;
+        addZoneBtn.disabled = false;
+      }
+
+      function addZone() {
+        if (zoneCount < maxZones) {
+          zoneCount++;
+          createZoneRow(zoneCount);
+          if (zoneCount === maxZones) addZoneBtn.disabled = true;
+        }
+      }
+
+      function Run() {
+        const ordered = Object.keys(zones)
+          .map(Number)
+          .sort((a, b) => a - b);
+
+        const names = ordered.map(i => zones[i].name || '??');
+
+        const hours = +document.getElementById('lowHours').value || 0;
+        const mins = +document.getElementById('lowMins').value || 0;
+
+        const now = Math.floor(Date.now() / 1000);
+        const ts = now + hours * 3600 + mins * 60;
+
+        const rawType = document.getElementById('zonetype').value;
+        const emojiKey = rawType.toLowerCase().replace(/\s+/g, '');
+
+        const finalZone =
+          document.getElementById('finalzone').value.trim() || '—';
+        const city =
+          document.getElementById('city').value || '—';
+
+        const finalPart = `:${emojiKey}:${finalZone} (${city}) <t:${ts}:R>`;
+
+        document.getElementById('result').value =
+          [...names, finalPart].join(' <> ');
+      }
+
+      // Init
+      addZone();
+      addZoneBtn.addEventListener('click', addZone);
+      document
+        .getElementById('calculate-button')
+        .addEventListener('click', Run);
+    });
+  </script>
+</body>
+</html>
+
+
+
