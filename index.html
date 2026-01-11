@@ -1,114 +1,209 @@
 <!DOCTYPE html>
 <html lang="en-nz">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Ava Roads Routes</title>
 
   <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      padding: 10px 50px;
+    /* Page background */
+    html, body {
+      height: 100%;
+      margin: 0;
+      background: #98FB98; /* mint green */
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
 
+    /* Centered card */
+    .wrap {
+      max-width: 800px;
+      margin: 28px auto;
+      padding: 18px;
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    }
+
+    header {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:16px;
+    }
+
+    h1 {
+      font-size:20px;
+      margin:0;
+      letter-spacing:0.2px;
+    }
+
+    /* Controls row */
+    .controls {
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      align-items:center;
+      margin-bottom:12px;
+    }
+
+    .controls .group {
+      display:flex;
+      gap:8px;
+      align-items:center;
+    }
+
+    input[type="text"], input[type="number"], select {
+      padding:6px 8px;
+      border:1px solid #d0d0d0;
+      border-radius:6px;
+      font-size:14px;
+    }
+
+    /* Zones area */
     #zones-container {
-      margin-bottom: 20px;
-    }
-
-    #add-zone {
-      margin-bottom: 20px;
+      margin-bottom: 12px;
     }
 
     .zone-row {
-      display: grid;
-      grid-template-columns: 200px 40px;
-      gap: 10px;
-      align-items: center;
-      margin-bottom: 8px;
+      display:grid;
+      grid-template-columns: 1fr 36px;
+      gap:8px;
+      align-items:center;
+      margin-bottom:8px;
     }
 
-    .zone-row .cell {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .zone-row .cell label {
-      font-size: 0.9em;
-      margin-bottom: 2px;
-    }
-
-    .zone-row .cell input {
-      width: 100%;
-      box-sizing: border-box;
+    .zone-row input[type="text"] {
+      height:34px;
     }
 
     .remove-btn {
-      width: 30px;
-      height: 30px;
-      font-weight: bold;
-      color: white;
-      background: #d9534f;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
+      width:34px;
+      height:34px;
+      border-radius:6px;
+      border:none;
+      background:#e05858;
+      color:white;
+      font-weight:700;
+      cursor:pointer;
     }
 
-    #result {
-      width: 100%;
-      margin-top: 10px;
-      box-sizing: border-box;
+    #add-zone {
+      margin-bottom: 10px;
+      background:#2b8a8a;
+      color:white;
+      border:none;
+      padding:8px 12px;
+      border-radius:8px;
+      cursor:pointer;
+      font-size:14px;
+    }
+
+    /* Time & result row */
+    .row-inline {
+      display:flex;
+      gap:8px;
+      align-items:center;
+      margin-bottom:12px;
+      flex-wrap:wrap;
     }
 
     #calculate-button {
-      margin-left: 10px;
+      background:#2b8a8a;
+      color:white;
+      border:none;
+      padding:8px 12px;
+      border-radius:8px;
+      cursor:pointer;
+      font-size:14px;
+    }
+
+    #result {
+      flex:1 1 100%;
+      padding:8px 10px;
+      border:1px solid #d0d0d0;
+      border-radius:6px;
+      box-sizing:border-box;
+      font-size:14px;
+    }
+
+    /* Small helper text */
+    .muted {
+      color:#666;
+      font-size:13px;
+    }
+
+    @media (max-width:520px){
+      .controls { gap:8px; }
+      header { flex-direction:column; align-items:flex-start; gap:8px; }
+      .row-inline { flex-direction:column; align-items:stretch; }
+      #result { flex-basis: auto; }
     }
   </style>
 </head>
 
 <body>
-  <h1>Yue's Ava Road :3</h1>
+  <div class="wrap">
+    <header>
+      <h1>Yue's Ava Road</h1>
+      <div class="muted">Simplified UI • Mint theme</div>
+    </header>
 
-  <!-- Zones -->
-  <div id="zones-container"></div>
-  <button id="add-zone">+ Add Zone</button>
+    <!-- Zones -->
+    <div id="zones-container"></div>
+    <button id="add-zone">+ Add Zone</button>
 
-  <!-- Final zone info -->
-  <div style="margin-top:15px;">
-    <label for="finalzone">Final Zone:</label>
-    <input type="text" id="finalzone" style="width:200px" placeholder="zone name">
+    <!-- Compact controls -->
+    <div class="controls" style="margin-top:10px;">
+      <div class="group">
+        <label for="finalzone" class="muted">Final Zone</label>
+        <input id="finalzone" type="text" placeholder="zone name" />
+      </div>
 
-    <select id="zonetype">
-      <option value="">--Zone Type--</option>
-      <option>Black Zone</option>
-      <option>Red Zone</option>
-      <option>Yellow Zone</option>
-      <option>Blue Zone</option>
-    </select>
-  </div>
+      <div class="group">
+        <label for="zonetype" class="muted">Type</label>
+        <select id="zonetype">
+          <option value="">--Type--</option>
+          <option>Black Zone</option>
+          <option>Red Zone</option>
+          <option>Yellow Zone</option>
+          <option>Blue Zone</option>
+        </select>
+      </div>
 
-  <div style="margin-top:10px;">
-    <label for="city">City:</label>
-    <select id="city">
-      <option value="">--City--</option>
-      <option value="FS">Fort Sterling</option>
-      <option value="ML">Martlock</option>
-      <option value="BW">Bridgewatch</option>
-      <option value="TH">Thetford</option>
-      <option value="LY">Lymhurst</option>
-    </select>
-  </div>
+      <div class="group">
+        <label for="city" class="muted">City</label>
+        <select id="city">
+          <option value="">--City--</option>
+          <option value="FS">Fort Sterling</option>
+          <option value="ML">Martlock</option>
+          <option value="BW">Bridgewatch</option>
+          <option value="TH">Thetford</option>
+          <option value="LY">Lymhurst</option>
+        </select>
+      </div>
+    </div>
 
-  <!-- ONE shared time input -->
-  <div style="margin-top:15px;">
-    <label>Lowest Remaining Time:</label>
-    <input type="number" id="lowHours" min="0" max="23" value="0" style="width:60px;"> h
-    <input type="number" id="lowMins" min="0" max="59" value="0" style="width:60px;"> m
-  </div>
+    <!-- Shared time input -->
+    <div class="row-inline">
+      <div class="group">
+        <label class="muted">Lowest Remaining Time</label>
+        <input id="lowHours" type="number" min="0" max="23" value="0" style="width:70px;" /> h
+        <input id="lowMins" type="number" min="0" max="59" value="0" style="width:70px;" /> m
+      </div>
+    </div>
 
-  <!-- Result -->
-  <div style="margin-top:15px;">
-    <input type="text" id="result" placeholder="Click Generate then copy to Discord">
-    <button id="calculate-button">Generate</button>
+    <!-- Result + generate -->
+    <div class="row-inline">
+      <input id="result" type="text" placeholder="Click Generate then copy to Discord" readonly />
+      <button id="calculate-button">Generate</button>
+    </div>
+
+    <div class="muted" style="margin-top:6px;">
+      Tip: Add zone initials, then press Generate.
+    </div>
   </div>
 
   <script>
@@ -126,10 +221,7 @@
         row.dataset.index = i;
 
         row.innerHTML = `
-          <div class="cell">
-            <label for="zone${i}-name">Zone Initials:</label>
-            <input id="zone${i}-name" type="text" placeholder="e.g. SOA">
-          </div>
+          <input id="zone${i}-name" type="text" placeholder="e.g. SOA">
           <button class="remove-btn" title="Remove zone">–</button>
         `;
 
@@ -138,9 +230,8 @@
 
         document
           .getElementById(`zone${i}-name`)
-          .addEventListener('input', () => {
-            zones[i].name =
-              document.getElementById(`zone${i}-name`).value.trim() || '??';
+          .addEventListener('input', (e) => {
+            zones[i].name = e.target.value.trim() || '??';
           });
 
         row.querySelector('.remove-btn')
@@ -148,9 +239,7 @@
       }
 
       function removeZone(i) {
-        const row = zonesContainer.querySelector(
-          `.zone-row[data-index='${i}']`
-        );
+        const row = zonesContainer.querySelector(`.zone-row[data-index='${i}']`);
         if (!row) return;
         row.remove();
         delete zones[i];
@@ -167,9 +256,11 @@
       }
 
       function Run() {
-        const ordered = Object.keys(zones)
-          .map(Number)
-          .sort((a, b) => a - b);
+        const ordered = Object.keys(zones).map(Number).sort((a, b) => a - b);
+        if (ordered.length === 0) {
+          document.getElementById('result').value = '';
+          return;
+        }
 
         const names = ordered.map(i => zones[i].name || '??');
 
@@ -179,26 +270,20 @@
         const now = Math.floor(Date.now() / 1000);
         const ts = now + hours * 3600 + mins * 60;
 
-        const rawType = document.getElementById('zonetype').value;
+        const rawType = document.getElementById('zonetype').value || '';
         const emojiKey = rawType.toLowerCase().replace(/\s+/g, '');
 
-        const finalZone =
-          document.getElementById('finalzone').value.trim() || '—';
-        const city =
-          document.getElementById('city').value || '—';
+        const finalZone = document.getElementById('finalzone').value.trim() || '—';
+        const city = document.getElementById('city').value || '—';
 
         const finalPart = `:${emojiKey}:${finalZone} (${city}) <t:${ts}:R>`;
-
-        document.getElementById('result').value =
-          [...names, finalPart].join(' <> ');
+        document.getElementById('result').value = [...names, finalPart].join(' <> ');
       }
 
       // Init
       addZone();
       addZoneBtn.addEventListener('click', addZone);
-      document
-        .getElementById('calculate-button')
-        .addEventListener('click', Run);
+      document.getElementById('calculate-button').addEventListener('click', Run);
     });
   </script>
 </body>
