@@ -3,168 +3,258 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Ava Roads Routes</title>
+  <title>Ava Roads Routes — Friendly UI</title>
 
   <style>
-    /* Page background */
-    html, body {
-      height: 100%;
-      margin: 0;
-      background: #98FB98; /* mint green */
-      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
+    :root{
+      /* color system */
+      --mint: #98FB98;           /* original mint */
+      --mint-soft: #eaffe7;      /* soft mint for card accents */
+      --card-bg: #ffffff;        /* main card bg */
+      --muted: #6b6b6b;
+      --text: #1b1b1b;
+      --primary: #2b8a8a;        /* buttons */
+      --primary-contrast: #ffffff;
+      --danger: #e05858;
+      --input-border: #d7d7d7;
+      --shadow: 0 8px 28px rgba(15,15,15,0.06);
+      --radius-lg: 14px;
+      --radius-md: 8px;
+      --max-width: 840px;
+      --gap: 12px;
+      --control-height: 40px;
     }
 
-    /* Centered card */
-    .wrap {
-      max-width: 800px;
-      margin: 28px auto;
-      padding: 18px;
-      background: #ffffff;
-      border-radius: 12px;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    /* Base / background */
+    html,body{
+      height:100%;
+      margin:0;
+      font-family: Inter, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      color:var(--text);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.45), rgba(255,255,255,0.55)),
+        radial-gradient(60% 60% at 10% 10%, rgba(152,251,152,0.10), transparent 15%),
+        var(--mint);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:28px;
+      box-sizing:border-box;
     }
 
-    header {
+    /* Card */
+    .wrap{
+      width:100%;
+      max-width:var(--max-width);
+      background:linear-gradient(180deg, var(--card-bg), var(--mint-soft));
+      border-radius:var(--radius-lg);
+      box-shadow:var(--shadow);
+      padding:20px;
+      box-sizing:border-box;
+      border: 1px solid rgba(0,0,0,0.03);
+    }
+
+    header{
       display:flex;
       align-items:center;
       justify-content:space-between;
       gap:12px;
-      margin-bottom:16px;
+      margin-bottom:18px;
     }
 
-    h1 {
+    h1{
       font-size:20px;
       margin:0;
+      color:var(--text);
       letter-spacing:0.2px;
     }
-
-    /* Controls row */
-    .controls {
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-      align-items:center;
-      margin-bottom:12px;
-    }
-
-    .controls .group {
-      display:flex;
-      gap:8px;
-      align-items:center;
-    }
-
-    input[type="text"], input[type="number"], select {
-      padding:6px 8px;
-      border:1px solid #d0d0d0;
-      border-radius:6px;
-      font-size:14px;
-    }
-
-    /* Zones area */
-    #zones-container {
-      margin-bottom: 12px;
-    }
-
-    .zone-row {
-      display:grid;
-      grid-template-columns: 1fr 36px;
-      gap:8px;
-      align-items:center;
-      margin-bottom:8px;
-    }
-
-    .zone-row input[type="text"] {
-      height:34px;
-    }
-
-    .remove-btn {
-      width:34px;
-      height:34px;
-      border-radius:6px;
-      border:none;
-      background:#e05858;
-      color:white;
-      font-weight:700;
-      cursor:pointer;
-    }
-
-    #add-zone {
-      margin-bottom: 10px;
-      background:#2b8a8a;
-      color:white;
-      border:none;
-      padding:8px 12px;
-      border-radius:8px;
-      cursor:pointer;
-      font-size:14px;
-    }
-
-    /* Time & result row */
-    .row-inline {
-      display:flex;
-      gap:8px;
-      align-items:center;
-      margin-bottom:12px;
-      flex-wrap:wrap;
-    }
-
-    #calculate-button {
-      background:#2b8a8a;
-      color:white;
-      border:none;
-      padding:8px 12px;
-      border-radius:8px;
-      cursor:pointer;
-      font-size:14px;
-    }
-
-    #result {
-      flex:1 1 100%;
-      padding:8px 10px;
-      border:1px solid #d0d0d0;
-      border-radius:6px;
-      box-sizing:border-box;
-      font-size:14px;
-    }
-
-    /* Small helper text */
-    .muted {
-      color:#666;
+    .tagline{
+      color:var(--muted);
       font-size:13px;
     }
 
-    @media (max-width:520px){
+    /* layout */
+    .row { display:flex; gap:var(--gap); align-items:center; flex-wrap:wrap; }
+    .col { display:flex; flex-direction:column; gap:8px; }
+
+    .controls {
+      display:flex;
+      gap:var(--gap);
+      align-items:center;
+      margin-bottom:14px;
+      flex-wrap:wrap;
+    }
+
+    label.small{
+      font-size:12px;
+      color:var(--muted);
+    }
+
+    input[type="text"], input[type="number"], select {
+      height:var(--control-height);
+      padding:8px 12px;
+      border-radius:var(--radius-md);
+      border:1px solid var(--input-border);
+      font-size:14px;
+      outline:none;
+      transition: box-shadow .15s ease, border-color .12s ease, transform .08s ease;
+      background: #fff;
+      color:var(--text);
+      min-width:120px;
+      box-sizing:border-box;
+    }
+
+    input[type="text"]:focus,
+    input[type="number"]:focus,
+    select:focus {
+      box-shadow: 0 6px 18px rgba(43,138,138,0.12);
+      border-color: rgba(43,138,138,0.8);
+      transform: translateY(-1px);
+    }
+
+    /* Zones area */
+    #zones-container{
+      margin-bottom:14px;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+
+    .zone-row{
+      display:grid;
+      grid-template-columns: 1fr 56px;
+      gap:8px;
+      align-items:center;
+    }
+
+    .zone-row input {
+      height:44px;
+      padding:10px 12px;
+      font-size:15px;
+      border-radius:10px;
+    }
+
+    .btn {
+      height:44px;
+      padding:10px 14px;
+      border-radius:10px;
+      border:none;
+      cursor:pointer;
+      font-weight:600;
+      font-size:14px;
+      transition: transform .08s ease, box-shadow .12s ease, opacity .12s ease;
+    }
+
+    .btn:active { transform: translateY(1px); }
+
+    #add-zone {
+      background: linear-gradient(180deg, var(--primary), #1f6f6f);
+      color: var(--primary-contrast);
+      border-radius: 10px;
+      padding:9px 14px;
+      box-shadow: 0 6px 16px rgba(43,138,138,0.12);
+      margin-bottom:8px;
+    }
+    #add-zone[disabled] { opacity:0.6; cursor:not-allowed; box-shadow:none; }
+
+    .remove-btn{
+      width:56px;
+      height:44px;
+      border-radius:10px;
+      border:none;
+      background:linear-gradient(180deg, #ff7070, #e04f4f);
+      color:white;
+      font-weight:700;
+      cursor:pointer;
+      box-shadow: 0 6px 14px rgba(224,79,79,0.12);
+    }
+
+    .remove-btn:hover { filter:brightness(.98); }
+
+    /* Time & result row */
+    .time-row{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      margin-top:6px;
+      flex-wrap:wrap;
+    }
+
+    .time-inputs { display:flex; gap:8px; align-items:center; }
+
+    .result-row {
+      display:flex;
+      gap:10px;
+      align-items:center;
+      margin-top:14px;
+    }
+
+    #result{
+      flex:1;
+      background:linear-gradient(180deg, #fff, #fbfffb);
+      padding:12px 14px;
+      border-radius:10px;
+      border:1px solid var(--input-border);
+      font-size:14px;
+      color:var(--text);
+      min-height:44px;
+      box-sizing:border-box;
+      overflow:auto;
+      word-break:break-all;
+    }
+
+    #calculate-button{
+      background: linear-gradient(180deg, var(--primary), #1f6f6f);
+      color:var(--primary-contrast);
+      padding:10px 14px;
+      border-radius:10px;
+      border:none;
+      cursor:pointer;
+      font-weight:700;
+      box-shadow: 0 8px 24px rgba(43,138,138,0.12);
+    }
+    #calculate-button:hover { transform: translateY(-2px); }
+
+    .muted { color:var(--muted); font-size:13px; }
+
+    /* Responsive */
+    @media (max-width:720px){
+      .wrap { padding:16px; }
+      .zone-row { grid-template-columns: 1fr 48px; }
+      #add-zone { width:100%; }
       .controls { gap:8px; }
       header { flex-direction:column; align-items:flex-start; gap:8px; }
-      .row-inline { flex-direction:column; align-items:stretch; }
-      #result { flex-basis: auto; }
     }
   </style>
 </head>
 
 <body>
-  <div class="wrap">
+  <div class="wrap" role="main" aria-labelledby="title">
     <header>
-      <h1>mathsuki's Ava Road</h1>
+      <div>
+        <h1 id="title">mathsuki's Ava Route Tool</h1>
+      </div>
+      <div class="muted" aria-hidden="true">v2.0</div>
     </header>
 
     <!-- Zones -->
-    <div id="zones-container"></div>
-    <button id="add-zone">+ Add Zone</button>
+    
+    <div id="zones-container" aria-live="polite"></div>
+    <button id="add-zone" class="btn" aria-label="Add zone">+ Add Zone</button>
 
     <!-- Compact controls -->
-    <div class="controls" style="margin-top:10px;">
-      <div class="group">
-        <label for="finalzone" class="muted">Final Zone</label>
-        <input id="finalzone" type="text" placeholder="zone name" />
+    <div class="controls" style="margin-top:12px;">
+      <div class="col" style="min-width:180px;">
+        <label class="small" for="finalzone">Final Zone</label>
+        <input id="finalzone" type="text" placeholder="zone name" aria-label="Final zone" />
       </div>
 
-      <div class="group">
-        <label for="zonetype" class="muted">Type</label>
-        <select id="zonetype">
-          <option value="">ZoneType</option>
+      <div class="col">
+        <label class="small" for="zonetype">Zone Type</label>
+        <select id="zonetype" aria-label="Zone type">
+          <option value="">zone type</option>
           <option>Black Zone</option>
           <option>Red Zone</option>
           <option>Yellow Zone</option>
@@ -172,36 +262,41 @@
         </select>
       </div>
 
-      <div class="group">
-        <label for="city" class="muted">City</label>
-        <select id="city">
-          <option value="">City</option>
+      <div class="col">
+        <label class="small" for="city">City</label>
+        <select id="city" aria-label="City">
+          <option value="">city</option>
           <option value="FS">Fort Sterling</option>
           <option value="ML">Martlock</option>
           <option value="BW">Bridgewatch</option>
           <option value="TH">Thetford</option>
-          <option value="LY">Lymhurst</option>
+          <option value="LYM">Lymhurst</option>
         </select>
       </div>
     </div>
 
     <!-- Shared time input -->
-    <div class="row-inline">
-      <div class="group">
-        <label class="muted">Lowest Remaining Time</label>
-        <input id="lowHours" type="number" min="0" max="23" value="0" style="width:70px;" /> h
-        <input id="lowMins" type="number" min="0" max="59" value="0" style="width:70px;" /> m
+    <div class="time-row">
+      <div class="time-inputs">
+        <div class="col">
+          <label class="small" for="lowHours">Lowest Remaining Time</label>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <input id="lowHours" type="number" min="0" max="23" value="0" aria-label="Lowest hours" style="width:88px;" /> <span class="muted">h</span>
+            <input id="lowMins" type="number" min="0" max="59" value="0" aria-label="Lowest minutes" style="width:88px;" /> <span class="muted">m</span>
+          </div>
+        </div>
       </div>
+      <div style="flex:1"></div>
     </div>
 
     <!-- Result + generate -->
-    <div class="row-inline">
-      <input id="result" type="text" placeholder="Click Generate then copy to Discord" readonly />
-      <button id="calculate-button">Generate</button>
+    <div class="result-row">
+      <div id="result" role="textbox" aria-readonly="true" aria-label="Generated output"> </div>
+      <button id="calculate-button" class="btn" aria-label="Generate discord string">Generate</button>
     </div>
 
-    <div class="muted" style="margin-top:6px;">
-      Tip: Add zone initials, then press Generate.
+    <div style="margin-top:12px;" class="muted">
+      Tip: Look for the portal that have the lowest remaining timer.
     </div>
   </div>
 
@@ -219,19 +314,19 @@
         row.className = 'zone-row';
         row.dataset.index = i;
 
+        // Input + remove button (clean)
         row.innerHTML = `
-          <input id="zone${i}-name" type="text" placeholder="e.g. SAO">
-          <button class="remove-btn" title="Remove zone">–</button>
+          <input id="zone${i}-name" type="text" placeholder="e.g. SAO" aria-label="Zone ${i} initials">
+          <button class="remove-btn" title="Remove zone" aria-label="Remove zone ${i}">–</button>
         `;
 
         zones[i] = { name: '' };
         zonesContainer.appendChild(row);
 
-        document
-          .getElementById(`zone${i}-name`)
-          .addEventListener('input', (e) => {
-            zones[i].name = e.target.value.trim() || '??';
-          });
+        const input = document.getElementById(`zone${i}-name`);
+        input.addEventListener('input', (e) => {
+          zones[i].name = e.target.value.trim() || '??';
+        });
 
         row.querySelector('.remove-btn')
            .addEventListener('click', () => removeZone(i));
@@ -255,12 +350,11 @@
       }
 
       function Run() {
-        const ordered = Object.keys(zones).map(Number).sort((a, b) => a - b);
+        const ordered = Object.keys(zones).map(Number).sort((a,b)=>a-b);
         if (ordered.length === 0) {
-          document.getElementById('result').value = '';
+          document.getElementById('result').textContent = '';
           return;
         }
-
         const names = ordered.map(i => zones[i].name || '??');
 
         const hours = +document.getElementById('lowHours').value || 0;
@@ -276,15 +370,28 @@
         const city = document.getElementById('city').value || '—';
 
         const finalPart = `:${emojiKey}:${finalZone} (${city}) <t:${ts}:R>`;
-        document.getElementById('result').value = [...names, finalPart].join(' <> ');
+        document.getElementById('result').textContent = [...names, finalPart].join(' <> ');
       }
 
-      // Init
+      // Initialize with one zone
       addZone();
+
+      // Events
       addZoneBtn.addEventListener('click', addZone);
       document.getElementById('calculate-button').addEventListener('click', Run);
+
+      // keyboard: Enter on inputs also generates
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          const active = document.activeElement;
+          if (active && (active.tagName === 'INPUT' || active.tagName === 'SELECT')) {
+            // prevent accidental form submissions when editing many fields
+            e.preventDefault();
+            Run();
+          }
+        }
+      });
     });
   </script>
 </body>
 </html>
-
