@@ -7,13 +7,12 @@
 
   <style>
     :root{
-      /* color system */
-      --mint: #98FB98;           /* original mint */
-      --mint-soft: #eaffe7;      /* soft mint for card accents */
-      --card-bg: #ffffff;        /* main card bg */
+      --mint: #98FB98;
+      --mint-soft: #eaffe7;
+      --card-bg: #ffffff;
       --muted: #6b6b6b;
       --text: #1b1b1b;
-      --primary: #2b8a8a;        /* buttons */
+      --primary: #2b8a8a;
       --primary-contrast: #ffffff;
       --danger: #e05858;
       --input-border: #d7d7d7;
@@ -23,9 +22,9 @@
       --max-width: 840px;
       --gap: 12px;
       --control-height: 40px;
+      --max-zones: 10;
     }
 
-    /* Base / background */
     html,body{
       height:100%;
       margin:0;
@@ -44,7 +43,6 @@
       box-sizing:border-box;
     }
 
-    /* Card */
     .wrap{
       width:100%;
       max-width:var(--max-width);
@@ -75,7 +73,6 @@
       font-size:13px;
     }
 
-    /* layout */
     .row { display:flex; gap:var(--gap); align-items:center; flex-wrap:wrap; }
     .col { display:flex; flex-direction:column; gap:8px; }
 
@@ -114,7 +111,6 @@
       transform: translateY(-1px);
     }
 
-    /* Zones area */
     #zones-container{
       margin-bottom:14px;
       display:flex;
@@ -134,6 +130,7 @@
       padding:10px 12px;
       font-size:15px;
       border-radius:10px;
+      text-transform:uppercase; /* visual uppercase */
     }
 
     .btn {
@@ -149,15 +146,30 @@
 
     .btn:active { transform: translateY(1px); }
 
+    /* Add zone + note row */
+    .add-zone-row {
+      display:flex;
+      align-items:center;
+      gap:12px;
+      margin-bottom:8px;
+      flex-wrap:wrap;
+    }
     #add-zone {
       background: linear-gradient(180deg, var(--primary), #1f6f6f);
       color: var(--primary-contrast);
       border-radius: 10px;
       padding:9px 14px;
       box-shadow: 0 6px 16px rgba(43,138,138,0.12);
-      margin-bottom:8px;
+      margin:0;
     }
     #add-zone[disabled] { opacity:0.6; cursor:not-allowed; box-shadow:none; }
+
+    .add-note {
+      color:var(--muted);
+      font-size:13px;
+      line-height:1;
+      white-space:nowrap;
+    }
 
     .remove-btn{
       width:56px;
@@ -173,7 +185,6 @@
 
     .remove-btn:hover { filter:brightness(.98); }
 
-    /* Time & result row */
     .time-row{
       display:flex;
       gap:12px;
@@ -189,20 +200,23 @@
       gap:10px;
       align-items:center;
       margin-top:14px;
+      flex-wrap:wrap;
     }
 
     #result{
       flex:1;
       background:linear-gradient(180deg, #fff, #fbfffb);
-      padding:12px 14px;
+      padding:14px 16px;
       border-radius:10px;
       border:1px solid var(--input-border);
-      font-size:14px;
+      font-size:15px;
       color:var(--text);
-      min-height:44px;
+      min-height:56px;
       box-sizing:border-box;
       overflow:auto;
       word-break:break-all;
+      white-space:pre-wrap;
+      user-select:text;
     }
 
     #calculate-button{
@@ -217,15 +231,34 @@
     }
     #calculate-button:hover { transform: translateY(-2px); }
 
+    #copy-button {
+      background: transparent;
+      border: 1px solid rgba(0,0,0,0.06);
+      padding:8px 10px;
+      border-radius:8px;
+      cursor:pointer;
+      font-weight:600;
+    }
+
+    .copy-msg {
+      font-size:13px;
+      color:var(--primary);
+      margin-left:8px;
+      opacity:0;
+      transition: opacity .25s ease;
+    }
+
+    .copy-msg.show { opacity:1; }
+
     .muted { color:var(--muted); font-size:13px; }
 
-    /* Responsive */
     @media (max-width:720px){
       .wrap { padding:16px; }
       .zone-row { grid-template-columns: 1fr 48px; }
       #add-zone { width:100%; }
       .controls { gap:8px; }
       header { flex-direction:column; align-items:flex-start; gap:8px; }
+      .add-zone-row { gap:8px; }
     }
   </style>
 </head>
@@ -240,9 +273,13 @@
     </header>
 
     <!-- Zones -->
-    
     <div id="zones-container" aria-live="polite"></div>
-    <button id="add-zone" class="btn" aria-label="Add zone">+ Add Zone</button>
+
+    <!-- Add zone + dynamic note -->
+    <div class="add-zone-row">
+      <button id="add-zone" class="btn" aria-label="Add zone">+ Add Zone</button>
+      <div class="add-note" id="add-note">Up to 10 zones</div>
+    </div>
 
     <!-- Compact controls -->
     <div class="controls" style="margin-top:12px;">
@@ -279,7 +316,7 @@
     <div class="time-row">
       <div class="time-inputs">
         <div class="col">
-          <label class="small" for="lowHours">Lowest Remaining Time</label>
+          <label class="small" for="lowHours">Portal With the Shortest Remaining Timer</label>
           <div style="display:flex; gap:8px; align-items:center;">
             <input id="lowHours" type="number" min="0" max="23" value="0" aria-label="Lowest hours" style="width:88px;" /> <span class="muted">h</span>
             <input id="lowMins" type="number" min="0" max="59" value="0" aria-label="Lowest minutes" style="width:88px;" /> <span class="muted">m</span>
@@ -289,32 +326,44 @@
       <div style="flex:1"></div>
     </div>
 
-    <!-- Result + generate -->
+    <!-- Result + generate + copy -->
     <div class="result-row">
-      <div id="result" role="textbox" aria-readonly="true" aria-label="Generated output"> </div>
-      <button id="calculate-button" class="btn" aria-label="Generate discord string">Generate</button>
+      <div id="result" role="textbox" aria-readonly="true" aria-label="Generated output"></div>
+      <div style="display:flex; gap:8px; align-items:center;">
+        <button id="calculate-button" class="btn" aria-label="Generate discord string">Generate</button>
+        <button id="copy-button" title="Copy" aria-label="Copy generated string">Copy</button>
+      </div>
     </div>
 
-    <div style="margin-top:12px;" class="muted">
-      Tip: Look for the portal that have the lowest remaining timer.
+    <div style="margin-top:12px; display:flex; align-items:center;">
+      <div class="muted">Tip: Add portal initials , Input Timer , Generate , Copy & Paste to Discord!</div>
+      <div class="copy-msg" id="copy-msg">Copied!</div>
     </div>
   </div>
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const maxZones = 10;
+      const maxZones = Number(getComputedStyle(document.documentElement).getPropertyValue('--max-zones')) || 10;
       let zoneCount = 0;
       const zones = {};
 
       const zonesContainer = document.getElementById('zones-container');
       const addZoneBtn = document.getElementById('add-zone');
+      const addNoteEl = document.getElementById('add-note');
+      const resultEl = document.getElementById('result');
+      const copyBtn = document.getElementById('copy-button');
+      const copyMsg = document.getElementById('copy-msg');
+
+      function updateAddNote() {
+        const slotsLeft = Math.max(0, maxZones - zoneCount);
+        addNoteEl.textContent = `${slotsLeft} slot${slotsLeft === 1 ? '' : 's'} left • Up to ${maxZones} zones`;
+      }
 
       function createZoneRow(i) {
         const row = document.createElement('div');
         row.className = 'zone-row';
         row.dataset.index = i;
 
-        // Input + remove button (clean)
         row.innerHTML = `
           <input id="zone${i}-name" type="text" placeholder="e.g. SAO" aria-label="Zone ${i} initials">
           <button class="remove-btn" title="Remove zone" aria-label="Remove zone ${i}">–</button>
@@ -325,11 +374,17 @@
 
         const input = document.getElementById(`zone${i}-name`);
         input.addEventListener('input', (e) => {
-          zones[i].name = e.target.value.trim() || '??';
+          // keep input uppercase visually & logically
+          const val = (e.target.value || '').toUpperCase();
+          e.target.value = val;
+          zones[i].name = val.trim();
+          // don't show ?? in object — we'll filter empty when generating
         });
 
         row.querySelector('.remove-btn')
            .addEventListener('click', () => removeZone(i));
+
+        updateAddNote();
       }
 
       function removeZone(i) {
@@ -337,8 +392,9 @@
         if (!row) return;
         row.remove();
         delete zones[i];
-        zoneCount--;
+        zoneCount = Math.max(0, zoneCount - 1);
         addZoneBtn.disabled = false;
+        updateAddNote();
       }
 
       function addZone() {
@@ -346,16 +402,21 @@
           zoneCount++;
           createZoneRow(zoneCount);
           if (zoneCount === maxZones) addZoneBtn.disabled = true;
+          updateAddNote();
         }
       }
 
       function Run() {
         const ordered = Object.keys(zones).map(Number).sort((a,b)=>a-b);
-        if (ordered.length === 0) {
-          document.getElementById('result').textContent = '';
+        // filter out empty names
+        const names = ordered
+          .map(i => (zones[i].name || '').trim())
+          .filter(s => s.length > 0);
+
+        if (names.length === 0) {
+          resultEl.textContent = '';
           return;
         }
-        const names = ordered.map(i => zones[i].name || '??');
 
         const hours = +document.getElementById('lowHours').value || 0;
         const mins = +document.getElementById('lowMins').value || 0;
@@ -370,22 +431,44 @@
         const city = document.getElementById('city').value || '—';
 
         const finalPart = `:${emojiKey}:${finalZone} (${city}) <t:${ts}:R>`;
-        document.getElementById('result').textContent = [...names, finalPart].join(' <> ');
+        resultEl.textContent = [...names, finalPart].join(' <> ');
       }
 
-      // Initialize with one zone
+      // initialize
       addZone();
+      updateAddNote();
 
-      // Events
+      // events
       addZoneBtn.addEventListener('click', addZone);
       document.getElementById('calculate-button').addEventListener('click', Run);
+      copyBtn.addEventListener('click', async () => {
+        const text = resultEl.textContent || '';
+        if (!text) return;
+        try {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(text);
+          } else {
+            // fallback
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            ta.remove();
+          }
+          // flash copied
+          copyMsg.classList.add('show');
+          setTimeout(() => copyMsg.classList.remove('show'), 1100);
+        } catch (err) {
+          console.error('copy failed', err);
+        }
+      });
 
       // keyboard: Enter on inputs also generates
       document.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
           const active = document.activeElement;
           if (active && (active.tagName === 'INPUT' || active.tagName === 'SELECT')) {
-            // prevent accidental form submissions when editing many fields
             e.preventDefault();
             Run();
           }
