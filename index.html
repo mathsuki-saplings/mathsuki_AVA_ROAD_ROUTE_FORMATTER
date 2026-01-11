@@ -307,7 +307,7 @@
           <option value="ML">Martlock</option>
           <option value="BW">Bridgewatch</option>
           <option value="TH">Thetford</option>
-          <option value="LYM">Lymhurst</option>
+          <option value="LY">Lymhurst</option>
         </select>
       </div>
     </div>
@@ -356,7 +356,7 @@
 
       function updateAddNote() {
         const slotsLeft = Math.max(0, maxZones - zoneCount);
-        addNoteEl.textContent = `${slotsLeft} slot${slotsLeft === 1 ? '' : 's'} left • Up to ${maxZones} zones`;
+        addNoteEl.textContent = ``;
       }
 
       function createZoneRow(i) {
@@ -427,10 +427,17 @@
         const rawType = document.getElementById('zonetype').value || '';
         const emojiKey = rawType.toLowerCase().replace(/\s+/g, '');
 
-        const finalZone = document.getElementById('finalzone').value.trim() || '—';
-        const city = document.getElementById('city').value || '—';
+        // City logic: if Black Zone is selected, append "P" to the city code in output
+        const cityRaw = document.getElementById('city').value || '—';
+        const zoneTypeNormalized = rawType.toLowerCase().trim();
+        let cityOut = cityRaw;
+        if (cityOut !== '—' && zoneTypeNormalized.includes('black')) {
+          if (!cityOut.endsWith('P')) cityOut = cityOut + 'P';
+        }
 
-        const finalPart = `:${emojiKey}:${finalZone} (${city}) <t:${ts}:R>`;
+        const finalZone = document.getElementById('finalzone').value.trim() || '—';
+
+        const finalPart = `:${emojiKey}:${finalZone} (${cityOut}) <t:${ts}:R>`;
         resultEl.textContent = [...names, finalPart].join(' <> ');
       }
 
