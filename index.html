@@ -147,8 +147,7 @@
 <body>
   <div class="wrap">
     <header>
-      <h1>Yue's Ava Road</h1>
-      <div class="muted">Simplified UI • Mint theme</div>
+      <h1>mathsuki's Ava Road</h1>
     </header>
 
     <!-- Zones -->
@@ -165,7 +164,7 @@
       <div class="group">
         <label for="zonetype" class="muted">Type</label>
         <select id="zonetype">
-          <option value="">--Type--</option>
+          <option value="">ZoneType</option>
           <option>Black Zone</option>
           <option>Red Zone</option>
           <option>Yellow Zone</option>
@@ -176,7 +175,7 @@
       <div class="group">
         <label for="city" class="muted">City</label>
         <select id="city">
-          <option value="">--City--</option>
+          <option value="">City</option>
           <option value="FS">Fort Sterling</option>
           <option value="ML">Martlock</option>
           <option value="BW">Bridgewatch</option>
@@ -221,7 +220,7 @@
         row.dataset.index = i;
 
         row.innerHTML = `
-          <input id="zone${i}-name" type="text" placeholder="e.g. SOA">
+          <input id="zone${i}-name" type="text" placeholder="e.g. SAO">
           <button class="remove-btn" title="Remove zone">–</button>
         `;
 
@@ -288,3 +287,4 @@
   </script>
 </body>
 </html>
+
