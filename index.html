@@ -256,43 +256,33 @@
     .muted { color:var(--muted); font-size:13px; }
 
     /* ---------- MOBILE / SMALL SCREEN ADJUSTMENTS ---------- */
-    /* These rules only affect narrow viewports and intentionally preserve desktop styling */
     @media (max-width:720px) {
-      /* make controls stacked and full width */
       .wrap { padding:16px; }
       .controls { flex-direction:column; align-items:stretch; gap:10px; }
       .controls .col { width:100%; }
       .col input, .col select { width:100%; min-width:0; }
 
-      /* Add zone area stacks */
       .add-zone-row { flex-direction:column; align-items:stretch; gap:8px; }
       #add-zone { width:100%; }
 
-      /* zone rows become slightly tighter and touch-friendly */
       .zone-row { grid-template-columns: 1fr 48px; gap:6px; }
       .zone-row input { height:48px; font-size:16px; padding:12px; }
       .remove-btn { width:48px; height:48px; border-radius:8px; }
 
-      /* time inputs stack */
       .time-row { flex-direction:column; align-items:stretch; gap:8px; }
       .time-inputs { width:100%; }
 
-      /* result and action buttons stack vertically for easier tapping */
       .result-row { flex-direction:column; align-items:stretch; gap:10px; }
       #result { min-height:84px; padding:12px; font-size:16px; }
       #calculate-button, #copy-button { width:100%; display:block; }
 
-      /* bigger tap targets for mobile */
       .btn, #copy-button { height:52px; font-size:16px; border-radius:10px; }
 
-      /* ensure the Add note wraps nicely */
       .add-note { text-align:left; font-size:13px; }
 
-      /* slightly larger header text */
       h1 { font-size:18px; }
     }
 
-    /* Extra-tight mobile phones */
     @media (max-width:420px) {
       body { padding:16px; }
       .wrap { padding:12px; border-radius:12px; }
@@ -302,9 +292,7 @@
       #calculate-button, #copy-button { height:52px; font-size:15px; }
     }
 
-    /* preserve original desktop breakpoints and look */
     @media (min-width:721px) {
-      /* keep the desktop/tighter layout as before */
       .controls { flex-direction:row; align-items:center; }
       .result-row { flex-direction:row; align-items:center; }
       .add-zone-row { flex-direction:row; align-items:center; }
@@ -361,6 +349,8 @@
           <option value="BW">Bridgewatch</option>
           <option value="TH">Thetford</option>
           <option value="LY">Lymhurst</option>
+          <!-- New special city -->
+          <option value="Brecilien">Brecilien</option>
         </select>
       </div>
     </div>
@@ -395,8 +385,6 @@
   </div>
 
   <script>
-    /* No JS changes: same behavior as your final patch.
-       This script is identical to your previous final version and is left intact. */
     document.addEventListener('DOMContentLoaded', () => {
       const maxZones = Number(getComputedStyle(document.documentElement).getPropertyValue('--max-zones')) || 10;
       let zoneCount = 0;
@@ -481,7 +469,13 @@
           return s;
         };
 
-        const names = rawNames.map(decorateName);
+        let names = rawNames.map(decorateName);
+
+        // Bold the very first zone initial (if not already bolded)
+        const isAlreadyBold = (str) => /^\*\*.*\*\*$/.test(str);
+        if (names.length > 0 && !isAlreadyBold(names[0])) {
+          names[0] = `**${names[0]}**`;
+        }
 
         const hours = +document.getElementById('lowHours').value || 0;
         const mins = +document.getElementById('lowMins').value || 0;
@@ -492,17 +486,34 @@
         const rawType = document.getElementById('zonetype').value || '';
         const emojiKey = rawType.toLowerCase().replace(/\s+/g, '');
 
-        // City logic: if Black Zone is selected, append "P" to the city code in output
+        // City logic:
+        // - If Brecilien selected => use Brecilien as the emoji label and IGNORE finalZone.
+        // - Else if Black Zone selected => append "P" to normal city codes (if not already).
         const cityRaw = document.getElementById('city').value || '—';
         const zoneTypeNormalized = rawType.toLowerCase().trim();
         let cityOut = cityRaw;
-        if (cityOut !== '—' && zoneTypeNormalized.includes('black')) {
-          if (!cityOut.endsWith('P')) cityOut = cityOut + 'P';
+
+        if (cityOut === 'Brecilien') {
+          // Brecilien special case: use directly and ignore finalZone.
+        } else {
+          if (cityOut !== '—' && zoneTypeNormalized.includes('black')) {
+            if (!cityOut.endsWith('P')) cityOut = cityOut + 'P';
+          }
         }
 
-        const finalZone = document.getElementById('finalzone').value.trim() || '—';
+        const finalZoneInput = document.getElementById('finalzone').value.trim() || '—';
 
-        const finalPart = `:${emojiKey}:${finalZone} (${cityOut}) <t:${ts}:R>`;
+        // Build the label that will be bolded
+        let label = '';
+        if (cityOut === 'Brecilien') {
+          label = `:${emojiKey}:Brecilien`;
+        } else {
+          label = `:${emojiKey}:${finalZoneInput} (${cityOut})`;
+        }
+
+        // Bold the label for Discord and keep the timestamp after it
+        const finalPart = `**${label}** <t:${ts}:R>`;
+
         resultEl.textContent = [...names, finalPart].join(' <> ');
       }
 
@@ -550,4 +561,3 @@
   </script>
 </body>
 </html>
-
